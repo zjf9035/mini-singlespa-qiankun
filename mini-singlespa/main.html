@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script type="module">
+      import { registerApplication, start } from "./single-spa/single-spa.js";
+      let app1 = {
+        bootstrap: async () => {
+          console.log("app1 bootstrap");
+        },
+        mount: [
+          async () => {
+            console.log("app1 mount1");
+          },
+          async () => {
+            console.log("app1 mount2");
+          },
+        ],
+        unmount: async () => {
+          console.log("app1 unmount");
+        },
+      };
+
+      let app2 = {
+        bootstrap: async () => {
+          console.log("app2 bootstrap");
+        },
+        mount: async () => {
+          console.log("app2 mount");
+        },
+        unmount: async () => {
+          console.log("app2 unmount");
+        },
+      };
+      registerApplication(
+        "app1",
+        async () => app1,
+        (location) => location.hash.startsWith("#/path1")
+      );
+      registerApplication(
+        "app2",
+        async () => app2,
+        (location) => location.hash.startsWith("#/path2")
+      );
+      start();
+      window.addEventListener("hashchange", () => {
+        console.log("我监听了hash");
+      });
+    </script>
+    <script>
+      function go() {
+        window.history.pushState({}, "", "#/path2");
+      }
+    </script>
+    <a href="#/path1">应用A</a>
+    <a href="#/path2">应用B</a>
+
+    <div onclick="go()">去应用B</div>
+  </body>
+</html>
